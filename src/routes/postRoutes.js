@@ -24,9 +24,14 @@ router.get('/:slug', getPostBySlug);
 
 // Private routes
 router.use(protect); // All routes below this will require authentication
+
+const uploadFields = upload.fields([
+  { name: 'coverImage', maxCount: 1 },
+  { name: 'contentImages', maxCount: 20 }
+]);
+
 router.post('/', (req, res, next) => {
-  upload.single('coverImage')(req, res, (err) => {
-    console.log(req.file)
+  uploadFields(req, res, (err) => {
     if (err) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ success: false, error: 'La imagen no puede superar los 5MB' });
@@ -36,7 +41,18 @@ router.post('/', (req, res, next) => {
     next();
   });
 }, createPost);
-router.put('/:id', updatePost);
+
+router.put('/:id', (req, res, next) => {
+  uploadFields(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, error: 'La imagen no puede superar los 5MB' });
+      }
+      return res.status(400).json({ success: false, error: err.message });
+    }
+    next();
+  });
+}, updatePost);
 router.patch('/:id/publish', publishPost);
 router.delete('/:id', deletePost);
 

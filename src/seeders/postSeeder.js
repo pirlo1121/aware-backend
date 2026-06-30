@@ -333,6 +333,202 @@ const posts = [
       }
     ]
   }
+  ,
+{
+  title: 'La procrastinación no es pereza',
+  slug: 'la-procrastinacion-no-es-pereza',
+  excerpt:
+    'Muchas veces no postergamos tareas por falta de disciplina, sino por emociones que no sabemos gestionar.',
+  coverImage:
+    'https://images.unsplash.com/photo-1497366754035-f200968a6e72',
+  status: 'published',
+  tags: ['psicologia', 'productividad', 'habitos'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'La procrastinación suele ser una estrategia temporal para evitar emociones desagradables.'
+    },
+    {
+      type: 'heading',
+      content: 'El problema emocional',
+      level: 2
+    },
+    {
+      type: 'quote',
+      content:
+        'No evitamos la tarea, evitamos cómo nos hace sentir.'
+    }
+  ]
+},
+
+{
+  title: 'El poder de caminar todos los días',
+  slug: 'el-poder-de-caminar-todos-los-dias',
+  excerpt:
+    'Una actividad simple puede generar beneficios físicos y mentales sorprendentes.',
+  coverImage:
+    'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429',
+  status: 'published',
+  tags: ['salud', 'ejercicio', 'bienestar'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Caminar diariamente mejora la salud cardiovascular y ayuda a reducir el estrés.'
+    },
+    {
+      type: 'image',
+      imageUrl:
+        'https://images.unsplash.com/photo-1465189684280-6a8fa9b19a7a'
+    }
+  ]
+},
+
+{
+  title: 'Por qué nos cuesta cambiar de opinión',
+  slug: 'por-que-nos-cuesta-cambiar-de-opinion',
+  excerpt:
+    'Nuestro cerebro tiende a proteger las creencias existentes incluso frente a nueva evidencia.',
+  coverImage:
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',
+  status: 'published',
+  tags: ['psicologia', 'sesgos', 'pensamiento'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Cambiar de opinión puede sentirse como una amenaza para nuestra identidad.'
+    },
+    {
+      type: 'quote',
+      content:
+        'La inteligencia también consiste en corregirse.'
+    }
+  ]
+},
+
+{
+  title: 'La disciplina vence a la motivación',
+  slug: 'la-disciplina-vence-a-la-motivacion',
+  excerpt:
+    'La motivación fluctúa. La disciplina permite avanzar incluso cuando no tenemos ganas.',
+  coverImage:
+    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438',
+  status: 'published',
+  tags: ['disciplina', 'habitos', 'productividad'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Las personas constantes no siempre están motivadas, pero sí comprometidas.'
+    },
+    {
+      type: 'list',
+      items: [
+        'Crear rutinas',
+        'Reducir fricción',
+        'Mantener consistencia'
+      ]
+    }
+  ]
+},
+
+{
+  title: 'Cómo afecta el sueño a nuestra mente',
+  slug: 'como-afecta-el-sueno-a-nuestra-mente',
+  excerpt:
+    'Dormir poco tiene consecuencias mucho mayores de lo que solemos imaginar.',
+  coverImage:
+    'https://images.unsplash.com/photo-1455642305367-68834a9dfe17',
+  status: 'published',
+  tags: ['salud', 'sueno', 'neurociencia'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Durante el sueño el cerebro consolida recuerdos y regula emociones.'
+    },
+    {
+      type: 'quote',
+      content:
+        'Dormir bien es una inversión, no una pérdida de tiempo.'
+    }
+  ]
+},
+
+{
+  title: 'El arte de escuchar',
+  slug: 'el-arte-de-escuchar',
+  excerpt:
+    'Escuchar activamente es una habilidad más rara y valiosa de lo que parece.',
+  coverImage:
+    'https://images.unsplash.com/photo-1515169067868-5387ec356754',
+  status: 'draft',
+  tags: ['comunicacion', 'psicologia'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Muchas personas escuchan para responder, no para comprender.'
+    },
+    {
+      type: 'heading',
+      content: 'Escucha activa',
+      level: 2
+    }
+  ]
+},
+
+{
+  title: 'La filosofía de Marco Aurelio',
+  slug: 'la-filosofia-de-marco-aurelio',
+  excerpt:
+    'Las Meditaciones siguen siendo una fuente de sabiduría práctica dos mil años después.',
+  coverImage:
+    'https://images.unsplash.com/photo-1516979187457-637abb4f9353',
+  status: 'draft',
+  tags: ['estoicismo', 'filosofia'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Marco Aurelio escribió para sí mismo, pero terminó ayudando a millones.'
+    },
+    {
+      type: 'quote',
+      content:
+        'La felicidad depende de la calidad de tus pensamientos.'
+    }
+  ]
+},
+
+{
+  title: '¿Qué es el pensamiento crítico?',
+  slug: 'que-es-el-pensamiento-critico',
+  excerpt:
+    'Una habilidad esencial en una época saturada de información.',
+  coverImage:
+    'https://images.unsplash.com/photo-1455390582262-044cdead277a',
+  status: 'draft',
+  tags: ['pensamiento', 'aprendizaje', 'filosofia'],
+  content: [
+    {
+      type: 'paragraph',
+      content:
+        'Pensar críticamente implica evaluar evidencia antes de aceptar una afirmación.'
+    },
+    {
+      type: 'list',
+      items: [
+        'Analizar',
+        'Cuestionar',
+        'Verificar',
+        'Concluir'
+      ]
+    }
+  ]
+}
 ];
 
 const importData = async () => {

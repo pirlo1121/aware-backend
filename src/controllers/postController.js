@@ -61,9 +61,25 @@ exports.createPost = async (req, res) => {
     }
 
     data.author = req.user.id;
-    console.log('file', req.file)
 
-    data.coverImage = req.file.location;
+    // Handle uploaded files (multipart fields → req.files)
+    if (req.files) {
+      if (req.files.coverImage && req.files.coverImage.length > 0) {
+        data.coverImage = req.files.coverImage[0].location;
+      }
+      if (req.files.contentImages && req.files.contentImages.length > 0) {
+        let imgIndex = 0;
+        for (const block of data.content) {
+          if (block.type === 'image' && imgIndex < req.files.contentImages.length) {
+            if (!block.imageUrl || block.imageUrl === '__UPLOAD__') {
+              block.imageUrl = req.files.contentImages[imgIndex].location;
+              imgIndex++;
+            }
+          }
+        }
+      }
+    }
+
     // Auto-generate slug from title
     console.log('titulo', data.title)
     let slug = slugify(data.title, { lower: true, strict: true });
@@ -115,9 +131,37 @@ exports.updatePost = async (req, res) => {
       return res.status(403).json({ success: false, error: 'User not authorized to update this post' });
     }
 
+    const data = req.body;
+
+    // Parse JSON-stringified fields (for multipart/form-data requests)
+    if (typeof data.tags === 'string') {
+      try { data.tags = JSON.parse(data.tags); } catch (e) { /* leave as-is */ }
+    }
+    if (typeof data.content === 'string') {
+      try { data.content = JSON.parse(data.content); } catch (e) { /* leave as-is */ }
+    }
+
+    // Handle uploaded files
+    if (req.files) {
+      if (req.files.coverImage && req.files.coverImage.length > 0) {
+        data.coverImage = req.files.coverImage[0].location;
+      }
+      if (req.files.contentImages && req.files.contentImages.length > 0) {
+        let imgIndex = 0;
+        for (const block of data.content) {
+          if (block.type === 'image' && imgIndex < req.files.contentImages.length) {
+            if (!block.imageUrl || block.imageUrl === '__UPLOAD__') {
+              block.imageUrl = req.files.contentImages[imgIndex].location;
+              imgIndex++;
+            }
+          }
+        }
+      }
+    }
+
     const wasDraft = post.status === 'draft';
 
-    post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+    post = await Post.findByIdAndUpdate(req.params.id, data, {
       new: true,
       runValidators: true
     });
