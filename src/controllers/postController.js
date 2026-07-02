@@ -1,6 +1,8 @@
 const Post = require('../models/Post');
 const slugify = require('slugify');
 const { notifyNewPost } = require('../services/notificationService');
+const { deletePostImages } = require('../services/s3CleanupService');
+const { sanitizePost } = require('../middlewares/sanitizeMiddleware');
 
 // @desc    Get all posts
 // @route   GET /api/posts
@@ -59,6 +61,8 @@ exports.createPost = async (req, res) => {
     if (typeof data.content === 'string') {
       try { data.content = JSON.parse(data.content); } catch (e) { /* leave as-is */ }
     }
+
+    sanitizePost(data);
 
     data.author = req.user.id;
 
@@ -140,6 +144,8 @@ exports.updatePost = async (req, res) => {
     if (typeof data.content === 'string') {
       try { data.content = JSON.parse(data.content); } catch (e) { /* leave as-is */ }
     }
+
+    sanitizePost(data);
 
     // Handle uploaded files
     if (req.files) {
@@ -250,6 +256,9 @@ exports.deletePost = async (req, res) => {
     if (post.author.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, error: 'User not authorized to delete this post' });
     }
+
+    // Clean up associated S3 images
+    await deletePostImages(post);
 
     await post.deleteOne();
 
