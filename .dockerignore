@@ -1,0 +1,7 @@
+node_modules
+.env
+npm-debug.log
+.git
+.gitignore
+ejemploModelo.js
+API_DOCUMENTATION.md
