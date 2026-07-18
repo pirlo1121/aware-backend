@@ -3,6 +3,9 @@ const slugify = require('slugify');
 const { notifyNewPost } = require('../services/notificationService');
 const { deletePostImages } = require('../services/s3CleanupService');
 const { sanitizePost } = require('../middlewares/sanitizeMiddleware');
+const postsCache = require('../utils/simpleCache');
+
+const POSTS_CACHE_TTL_MS = 30_000; // alineado con el Cache-Control de abajo
 
 // @desc    Get all posts (con paginación, lean, y caché)
 // @route   GET /api/posts
@@ -10,9 +13,10 @@ const { sanitizePost } = require('../middlewares/sanitizeMiddleware');
 exports.getPosts = async (req, res) => {
   try {
     let query = { status: 'published' };
+    const isAdmin = req.user && req.user.role === 'admin';
 
     // If admin, they can see all posts
-    if (req.user && req.user.role === 'admin') {
+    if (isAdmin) {
       query = {};
     }
 
@@ -20,8 +24,19 @@ exports.getPosts = async (req, res) => {
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
     const skip = (page - 1) * limit;
 
+    // Solo cacheamos la vista pública (posts publicados), que es la que recibe
+    // la mayoría del tráfico. La vista admin siempre va directo a la DB.
+    const cacheKey = !isAdmin ? `public:${page}:${limit}` : null;
+    const cached = cacheKey ? postsCache.get(cacheKey) : null;
+
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=30');
+      return res.status(200).json(cached);
+    }
+
     const [posts, total] = await Promise.all([
       Post.find(query)
+        .select('-content') // el listado no necesita el contenido completo del post
         .populate('author', 'name email')
         .sort({ publishedAt: -1, createdAt: -1 })
         .skip(skip)
@@ -30,15 +45,21 @@ exports.getPosts = async (req, res) => {
       Post.countDocuments(query),
     ]);
 
-    res.set('Cache-Control', 'public, max-age=30');
-    res.status(200).json({
+    const responseBody = {
       success: true,
       count: total,
       page,
       totalPages: Math.ceil(total / limit),
       hasMore: skip + limit < total,
       data: posts,
-    });
+    };
+
+    if (cacheKey) {
+      postsCache.set(cacheKey, responseBody, POSTS_CACHE_TTL_MS);
+    }
+
+    res.set('Cache-Control', 'public, max-age=30');
+    res.status(200).json(responseBody);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -119,6 +140,8 @@ exports.createPost = async (req, res) => {
 
     const post = await Post.create(data);
 
+    postsCache.clear();
+
     // Si el post se crea directamente como publicado, notificar a los subscriptores
     if (post.status === 'published') {
       notifyNewPost(post);
@@ -187,6 +210,8 @@ exports.updatePost = async (req, res) => {
       new: true,
       runValidators: true
     });
+
+    postsCache.clear();
 
     // Si era borrador y ahora está publicado, notificar
     if (wasDraft && post.status === 'published') {
@@ -266,6 +291,8 @@ exports.publishPost = async (req, res) => {
       { new: true, runValidators: true }
     );
 
+    postsCache.clear();
+
     // Notificar a los subscriptores sobre el nuevo post
     notifyNewPost(post);
 
@@ -295,6 +322,8 @@ exports.deletePost = async (req, res) => {
     await deletePostImages(post);
 
     await Post.findByIdAndDelete(req.params.id);
+
+    postsCache.clear();
 
     res.status(200).json({ success: true, data: {} });
   } catch (error) {
