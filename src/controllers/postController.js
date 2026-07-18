@@ -106,19 +106,16 @@ exports.createPost = async (req, res) => {
     }
 
     // Auto-generate slug from title
-    console.log('titulo', data.title)
     let slug = slugify(data.title, { lower: true, strict: true });
     let counter = 1;
     let baseSlug = slug;
 
-    while (await Post.findOne({ slug })) {
+    while (await Post.exists({ slug })) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
 
     data.slug = slug;
-
-    console.log(data)
 
     const post = await Post.create(data);
 
@@ -129,8 +126,6 @@ exports.createPost = async (req, res) => {
 
     res.status(201).json({ success: true, data: post });
   } catch (error) {
-    console.log(error)
-
     // Handle Mongoose validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(val => val.message);
@@ -145,7 +140,7 @@ exports.createPost = async (req, res) => {
 // @access  Private
 exports.updatePost = async (req, res) => {
   try {
-    let post = await Post.findById(req.params.id);
+    let post = await Post.findById(req.params.id).select('author status').lean();
 
     if (!post) {
       return res.status(404).json({ success: false, error: 'Post not found' });
@@ -251,7 +246,7 @@ exports.getDrafts = async (req, res) => {
 // @access  Private (author or admin)
 exports.publishPost = async (req, res) => {
   try {
-    let post = await Post.findById(req.params.id);
+    let post = await Post.findById(req.params.id).select('author status').lean();
 
     if (!post) {
       return res.status(404).json({ success: false, error: 'Post not found' });
@@ -285,7 +280,7 @@ exports.publishPost = async (req, res) => {
 // @access  Private
 exports.deletePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id).select('author coverImage content').lean();
 
     if (!post) {
       return res.status(404).json({ success: false, error: 'Post not found' });
@@ -299,7 +294,7 @@ exports.deletePost = async (req, res) => {
     // Clean up associated S3 images
     await deletePostImages(post);
 
-    await post.deleteOne();
+    await Post.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ success: true, data: {} });
   } catch (error) {

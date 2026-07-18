@@ -176,6 +176,7 @@ PostSchema.pre('findOneAndUpdate', function () {
 // ─── Índices ────────────────────────────────────────────────────────────────
 
 PostSchema.index({ status: 1, publishedAt: -1 }); // Listar posts publicados ordenados
+PostSchema.index({ status: 1, updatedAt: -1 });    // Listar drafts ordenados (getDrafts)
 PostSchema.index({ tags: 1 });                     // Filtrar por tag
 PostSchema.index({ author: 1 });                   // Posts por autor
 

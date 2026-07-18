@@ -26,4 +26,6 @@ const subscriberSchema = new mongoose.Schema({
   timestamps: true
 });
 
+subscriberSchema.index({ status: 1 }); // Filtrar subscriptores activos al notificar
+
 module.exports = mongoose.model('Subscriber', subscriberSchema);

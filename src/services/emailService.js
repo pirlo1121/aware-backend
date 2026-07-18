@@ -34,7 +34,6 @@ const sendEmail = async ({ to, subject, html }) => {
   }
 
   try {
-    console.log('jiji ', process.env.FROM_EMAIL);
     const { data, error } = await resend.emails.send({
       from: process.env.FROM_EMAIL,
       to,

@@ -1,6 +1,19 @@
 const Subscriber = require('../models/Subscriber');
 const { sendEmail } = require('./emailService');
 
+const EMAIL_BATCH_SIZE = 20;
+
+/**
+ * Envía correos en lotes para no saturar la API de Resend (rate limits)
+ * ni disparar cientos de requests concurrentes de golpe.
+ */
+const sendInBatches = async (items, sendFn, batchSize = EMAIL_BATCH_SIZE) => {
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    await Promise.allSettled(batch.map(sendFn));
+  }
+};
+
 /**
  * Notifica a todos los subscriptores activos sobre un nuevo post publicado.
  * Los correos se envían en segundo plano (fire & forget) para no bloquear la respuesta HTTP.
@@ -11,7 +24,7 @@ const notifyNewPost = async (post) => {
   console.log(`[NotificationService] notifyNewPost llamado para: "${post.title}"`);
 
   try {
-    const subscribers = await Subscriber.find({ status: 'active' });
+    const subscribers = await Subscriber.find({ status: 'active' }).lean();
 
     if (subscribers.length === 0) {
       console.log('[NotificationService] No hay subscriptores activos para notificar.');
@@ -98,15 +111,13 @@ const notifyNewPost = async (post) => {
       </html>
     `;
 
-    const emailPromises = subscribers.map((sub) =>
+    await sendInBatches(subscribers, (sub) =>
       sendEmail({
         to: sub.email,
         subject: `Nuevo artículo: ${post.title}`,
         html: htmlTemplate(sub.name),
       })
     );
-
-    await Promise.allSettled(emailPromises);
 
     console.log(`[NotificationService] Proceso completado para ${subscribers.length} subscriptores.`);
   } catch (error) {
