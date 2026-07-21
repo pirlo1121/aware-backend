@@ -62,7 +62,7 @@ const notifyNewPost = async (post) => {
                 <tr>
                   <td style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px 30px; text-align: center;">
                     <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 1px;">
-                      Aware
+                      Mind Mirror
                     </h1>
                     <p style="color: rgba(255,255,255,0.7); font-size: 13px; margin: 6px 0 0 0; letter-spacing: 0.5px;">
                       NUEVO ARTÍCULO
