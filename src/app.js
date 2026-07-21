@@ -10,6 +10,10 @@ const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
+// Confía en el primer proxy delante de la app (load balancer / Cloudflare)
+// para que req.ip y express-rate-limit lean X-Forwarded-For correctamente.
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
